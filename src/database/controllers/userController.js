@@ -12,7 +12,7 @@ exports.findById = (userId) => {
 
 exports.findByEmail = (email) => {
     return new Promise((resolve, reject) => {
-        userModel.findOne(email)
+        userModel.findOne({ email })
             .exec((err, user) => {
                 if (err) reject(err)
                 resolve(user)

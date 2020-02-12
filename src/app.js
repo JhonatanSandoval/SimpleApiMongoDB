@@ -1,18 +1,22 @@
 const port = process.env.APP_PORT || 3000
 
-const http = require('http');
-const express = require('express');
+const http = require('http')
+const express = require('express')
 const cors = require('cors')
+const bodyParser = require('body-parser')
 
-const app = express();
+const app = express()
 app.use(cors())
-app.set('port', port);
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json())
+app.set('port', port)
 
 // connection to mongo
 require('mongoose')
     .connect("mongodb://localhost/testing_api", {
         useCreateIndex: true,
-        useNewUrlParser: true
+        useNewUrlParser: true,
+        useUnifiedTopology: true
     })
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB Connection error', err))
@@ -29,4 +33,4 @@ const server = http.createServer(app);
 server.listen(port, err => {
     if (err) throw err
     console.log('=======> Server started on port', port)
-});
+})
