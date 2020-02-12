@@ -1,1 +1,1 @@
-Working on it
+For a "complete" implementation, see **jwt-auth** branch :)
