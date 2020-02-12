@@ -17,9 +17,9 @@ exports.getPosts = () => {
 
 exports.findById = (postId) => {
     return new Promise((resolve, reject) => {
-        postModel.findOne({ _id: postId }).exec((err, posts) => {
+        postModel.findOne({ _id: postId }).exec((err, post) => {
             if (err) reject(err)
-            resolve(posts)
+            resolve(post)
         })
     })
 }
@@ -35,13 +35,16 @@ exports.writePost = (userId, comment) => {
     })
 }
 
-exports.commentPost = async (userId, postId, comment) => {
-    let post = await _this.findById(postId)
-    if (post != null) {
-        post.comments.push({
-            user: userId,
-            comment
-        })
-        post.save()
-    }
+exports.commentPost = (post, data) => {
+    return new Promise((resolve, reject) => {
+        if (post != null) {
+            post.comments.push(data)
+            post.save((err, result) => {
+                if (err) reject(err)
+                resolve(result)
+            })
+        } else {
+            reject(null)
+        }
+    })
 }

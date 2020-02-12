@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express()
+const jwt = require('jsonwebtoken')
 
 const CONSTANTS = require('../constants')
 
@@ -13,7 +14,11 @@ router.post('/register', (req, res) => {
             if (user == null) {
                 userController.insert({ names, email, password })
                     .then(result => {
-                        res.json({ success: true, message: 'User successfully registered', userId: result._id })
+                        const token = generateToken({
+                            _id: result._id,
+                            names, email
+                        })
+                        res.json({ success: true, message: 'User successfully registered', token })
                     })
                     .catch(err => {
                         console.error(err)
@@ -30,6 +35,26 @@ router.post('/register', (req, res) => {
 
 })
 
+router.post('/login', (req, res) => {
+    const { email, password } = req.body
+    userController.findByEmail(email)
+        .then(user => {
+            if (user != null) {
+                if (password === user.password) {
+                    const token = generateToken(user)
+                    res.json({ success: true, message: 'Welcome back', user, token })
+                } else {
+                    res.json({ success: false, message: 'Incorrect credentials' })
+                }
+            } else {
+                res.json({ success: false, message: 'Unable to find user registered whith this email' })
+            }
+        })
+        .catch(error =>
+            res.status(500).json({ success: false, message: CONSTANTS.SERVER_ERROR_MESSAGE })
+        )
+})
+
 
 router.put('/update', (req, res) => {
     const { userId, names, email, password } = req.body
@@ -43,5 +68,11 @@ router.put('/update', (req, res) => {
             res.status(500).json({ success: false, message: CONSTANTS.SERVER_ERROR_MESSAGE })
         })
 })
+
+let generateToken = (user) => {
+    return jwt.sign({ user }, CONSTANTS.JWT.SEED, {
+        expiresIn: CONSTANTS.JWT.EXPIRATION
+    })
+}
 
 module.exports = router
