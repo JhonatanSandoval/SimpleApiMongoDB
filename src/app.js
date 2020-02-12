@@ -10,7 +10,7 @@ app.set('port', port);
 
 // connection to mongo
 require('mongoose')
-    .connect("mongodb://localhost/seguridad_ciudadana", {
+    .connect("mongodb://localhost/testing_api", {
         useCreateIndex: true,
         useNewUrlParser: true
     })
